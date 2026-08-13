@@ -49,5 +49,50 @@ const Render = (() => {
     `;
   }
 
-  return { getParam, renderNav, renderCourseMap, courseProgressLabel };
+  function renderCoursePage(course, modules, progressState, container) {
+    if (course.status === 'placeholder') {
+      container.innerHTML = `
+        <header class="page-header">
+          <h1>${course.title}</h1>
+          <p class="subtitle">${course.description}</p>
+          <a class="external-link" href="${course.skilljarUrl}" target="_blank" rel="noopener">Open official course on Skilljar ↗</a>
+        </header>
+        <section class="section">
+          <span class="status-badge status-badge--placeholder">Coming Soon</span>
+          <p class="subtitle" style="margin-top:0.75rem;">Not yet started. This course's study guide and practice test will be built out once it's actually completed.</p>
+        </section>
+      `;
+      return;
+    }
+
+    const moduleRows = modules.map((m) => {
+      const studied = Progress.isModuleStudied(progressState, course.id, m.id);
+      return `
+        <a class="module-row" href="module.html?course=${course.id}&module=${m.id}">
+          <span class="module-row-status">${studied ? '✓' : '○'}</span>
+          <span class="module-row-title">${m.title}</span>
+        </a>`;
+    }).join('');
+
+    const best = Progress.bestPracticeScore(progressState, course.id);
+
+    container.innerHTML = `
+      <header class="page-header">
+        <h1>${course.title}</h1>
+        <p class="subtitle">${course.description}</p>
+        <a class="external-link" href="${course.skilljarUrl}" target="_blank" rel="noopener">Open official course on Skilljar ↗</a>
+      </header>
+      <section class="section">
+        <h2>Modules</h2>
+        <div class="module-list">${moduleRows}</div>
+      </section>
+      <section class="section">
+        <h2>Practice Test</h2>
+        <p class="subtitle">${best === null ? "You haven't attempted this course's practice test yet." : `Best score: ${best}%`}</p>
+        <a class="button" href="practice-test.html?course=${course.id}">Take Practice Test</a>
+      </section>
+    `;
+  }
+
+  return { getParam, renderNav, renderCourseMap, courseProgressLabel, renderCoursePage };
 })();
