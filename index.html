@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Certified Architect – Foundations: Study Guide</title>
+  <meta name="description" content="A study companion for the Claude Certified Architect – Foundations certification path.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="nav"></div>
+  <main id="app"></main>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="data/courses.js"></script>
+  <script src="js/render.js"></script>
+  <script>
+    document.getElementById('nav').innerHTML = Render.renderNav('home');
+    const progressState = Progress.load(window.localStorage);
+    Render.renderCourseMap(COURSES, progressState, document.getElementById('app'));
+  </script>
+</body>
+</html>
