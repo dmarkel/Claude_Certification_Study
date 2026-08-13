@@ -1646,7 +1646,7 @@ git commit -m "Add Course 1 scored practice-test question bank"
 
 - [ ] **Step 1: Extend render.js with renderPracticeTest**
 
-Add to `js/render.js`, before the final `return`:
+Add to `js/render.js`, before the final `return`. Note the option buttons below are marked `type="button"` — without it, a plain `<button>` inside a `<form>` defaults to `type="submit"`, so clicking any single option would immediately submit the whole test (this was caught live in a browser during Sub-project 1's implementation and fixed; kept explicit here so the same bug isn't reintroduced when this pattern is reused for a future course's practice test):
 
 ```js
   const DOMAIN_LABELS = {
@@ -1662,7 +1662,7 @@ Add to `js/render.js`, before the final `return`:
       <div class="question-card" data-question-id="${q.id}">
         <p class="question-prompt">${i + 1}. ${q.prompt}</p>
         <div class="option-list">
-          ${q.options.map((opt) => `<button class="option-button" data-option-id="${opt.id}">${opt.text}</button>`).join('')}
+          ${q.options.map((opt) => `<button type="button" class="option-button" data-option-id="${opt.id}">${opt.text}</button>`).join('')}
         </div>
         <div class="explanation" style="display:none;"></div>
       </div>
