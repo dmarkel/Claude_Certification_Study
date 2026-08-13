@@ -175,8 +175,11 @@ const Render = (() => {
     'genai-fundamentals': 'Generative AI Fundamentals',
   };
 
-  function renderPracticeTest(course, questions, progressState, container) {
-    document.title = `Practice Test: ${course.title} – Claude Certified Architect Study Guide`;
+  function renderScoredTest(course, questions, progressState, container, kind) {
+    const isFinal = kind === 'final';
+    const heading = isFinal ? 'Final Exam' : 'Practice Test';
+    document.title = `${heading}: ${course.title} – Claude Certified Architect Study Guide`;
+
     const questionsHtml = questions.map((q, i) => `
       <div class="question-card" data-question-id="${q.id}">
         <p class="question-prompt">${i + 1}. ${q.prompt}</p>
@@ -190,18 +193,18 @@ const Render = (() => {
     container.innerHTML = `
       <header class="page-header">
         <p class="subtitle" style="margin-bottom:0.25rem;"><a href="course.html?course=${course.id}">← ${course.title}</a></p>
-        <h1>Practice Test</h1>
+        <h1>${heading}</h1>
         <p class="subtitle">Answer every question, then submit for your score and a domain breakdown.</p>
       </header>
       <div id="results"></div>
-      <form id="practice-test-form">
+      <form id="scored-test-form">
         ${questionsHtml}
-        <button type="submit" class="button">Submit Test</button>
+        <button type="submit" class="button">Submit ${isFinal ? 'Exam' : 'Test'}</button>
       </form>
     `;
 
     const answers = {};
-    const form = container.querySelector('#practice-test-form');
+    const form = container.querySelector('#scored-test-form');
 
     questions.forEach((q) => {
       const card = form.querySelector(`[data-question-id="${q.id}"]`);
@@ -232,7 +235,11 @@ const Render = (() => {
         explanationEl.style.display = 'block';
       });
 
-      Progress.recordPracticeScore(progressState, course.id, result.percent);
+      if (isFinal) {
+        Progress.recordFinalExamScore(progressState, course.id, result.percent);
+      } else {
+        Progress.recordPracticeScore(progressState, course.id, result.percent);
+      }
       Progress.save(progressState, window.localStorage);
 
       const domainRows = result.domainBreakdown.map((d) => `
@@ -256,6 +263,6 @@ const Render = (() => {
 
   return {
     getParam, renderNav, renderCourseMap, courseProgressLabel,
-    renderCoursePage, renderModulePage, renderPracticeTest,
+    renderCoursePage, renderModulePage, renderScoredTest,
   };
 })();

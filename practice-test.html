@@ -10,6 +10,7 @@
   <div id="nav"></div>
   <main id="app"></main>
   <script src="js/quiz-engine.js"></script>
+  <script src="js/sampling.js"></script>
   <script src="js/progress.js"></script>
   <script src="data/courses.js"></script>
   <script src="data/questions/ai-fluency-foundations.js"></script>
@@ -19,12 +20,13 @@
     const courseId = Render.getParam('course');
     const course = COURSES.find((c) => c.id === courseId);
     const app = document.getElementById('app');
-    const questions = courseId === 'ai-fluency-foundations' ? QUESTIONS_AI_FLUENCY_FOUNDATIONS : [];
-    if (!course || questions.length === 0) {
+    const allQuestions = courseId === 'ai-fluency-foundations' ? QUESTIONS_AI_FLUENCY_FOUNDATIONS : [];
+    if (!course || allQuestions.length === 0) {
       app.innerHTML = '<p>No practice test available yet for this course. <a href="index.html">Back to course map</a>.</p>';
     } else {
+      const sampled = Sampling.sampleByDomain(allQuestions, 3);
       const progressState = Progress.load(window.localStorage);
-      Render.renderPracticeTest(course, questions, progressState, app);
+      Render.renderScoredTest(course, sampled, progressState, app, 'practice');
     }
   </script>
 </body>
