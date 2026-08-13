@@ -94,5 +94,70 @@ const Render = (() => {
     `;
   }
 
-  return { getParam, renderNav, renderCourseMap, courseProgressLabel, renderCoursePage };
+  function renderKnowledgeCheck(question) {
+    const optionsHtml = question.options.map((opt) =>
+      `<button class="option-button" data-option-id="${opt.id}">${opt.text}</button>`
+    ).join('');
+    return `
+      <div class="question-card" data-question-id="${question.id}">
+        <p class="question-prompt">${question.prompt}</p>
+        <div class="option-list">${optionsHtml}</div>
+        <div class="explanation" style="display:none;"></div>
+      </div>
+    `;
+  }
+
+  function wireKnowledgeChecks(container, questions) {
+    questions.forEach((q) => {
+      const card = container.querySelector(`[data-question-id="${q.id}"]`);
+      const explanationEl = card.querySelector('.explanation');
+      card.querySelectorAll('.option-button').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selectedId = btn.getAttribute('data-option-id');
+          card.querySelectorAll('.option-button').forEach((b) => {
+            b.disabled = true;
+            const optId = b.getAttribute('data-option-id');
+            if (optId === q.correctOptionId) b.classList.add('option-button--correct');
+            else if (optId === selectedId) b.classList.add('option-button--incorrect');
+          });
+          explanationEl.textContent = q.explanation;
+          explanationEl.style.display = 'block';
+        });
+      });
+    });
+  }
+
+  function renderModulePage(course, module, progressState, container) {
+    const alreadyStudied = Progress.isModuleStudied(progressState, course.id, module.id);
+    container.innerHTML = `
+      <header class="page-header">
+        <p class="subtitle" style="margin-bottom:0.25rem;"><a href="course.html?course=${course.id}">← ${course.title}</a></p>
+        <h1>${module.title}</h1>
+        <p class="subtitle">${module.summary}</p>
+      </header>
+      <div class="key-concepts">
+        <strong>Key concepts</strong>
+        <ul>${module.keyConcepts.map((k) => `<li>${k}</li>`).join('')}</ul>
+      </div>
+      <section class="section">${module.body.map((p) => `<p>${p}</p>`).join('')}</section>
+      <section class="section">
+        <h2>Knowledge Check</h2>
+        ${module.knowledgeChecks.map(renderKnowledgeCheck).join('')}
+      </section>
+      <button id="mark-studied-btn" class="button" ${alreadyStudied ? 'disabled' : ''}>
+        ${alreadyStudied ? '✓ Marked as studied' : 'Mark as studied'}
+      </button>
+    `;
+
+    wireKnowledgeChecks(container, module.knowledgeChecks);
+
+    container.querySelector('#mark-studied-btn').addEventListener('click', (e) => {
+      Progress.markModuleStudied(progressState, course.id, module.id);
+      Progress.save(progressState, window.localStorage);
+      e.target.disabled = true;
+      e.target.textContent = '✓ Marked as studied';
+    });
+  }
+
+  return { getParam, renderNav, renderCourseMap, courseProgressLabel, renderCoursePage, renderModulePage };
 })();
