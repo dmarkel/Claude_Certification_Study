@@ -81,6 +81,7 @@ const Render = (() => {
     }).join('');
 
     const best = Progress.bestPracticeScore(progressState, course.id);
+    const bestFinal = Progress.bestFinalExamScore(progressState, course.id);
 
     container.innerHTML = `
       <header class="page-header">
@@ -96,6 +97,12 @@ const Render = (() => {
         <h2>Practice Test</h2>
         <p class="subtitle">${best === null ? "You haven't attempted this course's practice test yet." : `Best score: ${best}%`}</p>
         <a class="button" href="practice-test.html?course=${course.id}">Take Practice Test</a>
+      </section>
+      <section class="section">
+        <h2>Final Exam</h2>
+        <p class="subtitle">A longer, comprehensive test across all of this course's domains — modeled on the real exam's format. Scoped to this course's own material, not the official CCAR-F blueprint (see the <a href="project-plan.html">Project Plan</a>).</p>
+        <p class="subtitle">${bestFinal === null ? "You haven't attempted the final exam yet." : `Best score: ${bestFinal}%`}</p>
+        <a class="button button--secondary" href="final-exam.html?course=${course.id}">Take Final Exam</a>
       </section>
     `;
   }
