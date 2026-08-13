@@ -8,6 +8,7 @@ const Progress = (() => {
     return {
       modulesStudied: {},   // "<courseId>:<moduleId>" -> true
       practiceScores: {},   // "<courseId>" -> best percent (0-100)
+      finalExamScores: {},  // "<courseId>" -> best percent (0-100)
     };
   }
 
@@ -20,6 +21,7 @@ const Progress = (() => {
       return {
         modulesStudied: (parsed.modulesStudied && typeof parsed.modulesStudied === 'object') ? parsed.modulesStudied : fresh.modulesStudied,
         practiceScores: (parsed.practiceScores && typeof parsed.practiceScores === 'object') ? parsed.practiceScores : fresh.practiceScores,
+        finalExamScores: (parsed.finalExamScores && typeof parsed.finalExamScores === 'object') ? parsed.finalExamScores : fresh.finalExamScores,
       };
     } catch {
       return freshState();
@@ -60,9 +62,22 @@ const Progress = (() => {
       : null;
   }
 
+  function recordFinalExamScore(state, courseId, percent) {
+    const prev = state.finalExamScores[courseId] || 0;
+    state.finalExamScores[courseId] = Math.max(prev, percent);
+    return state;
+  }
+
+  function bestFinalExamScore(state, courseId) {
+    return Object.prototype.hasOwnProperty.call(state.finalExamScores, courseId)
+      ? state.finalExamScores[courseId]
+      : null;
+  }
+
   return {
     freshState, load, save, markModuleStudied, isModuleStudied,
     courseModuleProgress, recordPracticeScore, bestPracticeScore,
+    recordFinalExamScore, bestFinalExamScore,
   };
 })();
 
