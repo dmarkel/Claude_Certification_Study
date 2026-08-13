@@ -13,9 +13,14 @@ deployed, or [`docs/superpowers/specs/`](docs/superpowers/specs/) for the full d
 - A course map covering all 7 prep courses in the certification path. Course 1
   (AI Fluency: Framework & Foundations) is fully built out; the rest are placeholder
   stubs, filled in as each course is actually completed.
-- Per-module study guides and ungraded knowledge checks.
+- Per-module study guides with knowledge checks that rotate — a random 3 of 6 shown
+  each visit, so revisiting a module for review surfaces different questions.
 - A scored practice test per course with immediate per-question feedback and an
   end-of-test domain breakdown, modeled on the real exam's format and score report.
+  Questions rotate here too, drawn from a larger per-domain pool on every attempt.
+- A comprehensive Final Exam for Course 1 — a longer, one-sitting test (30 questions,
+  6 per domain) modeled on the real exam's feel, with its own independently-tracked
+  best score.
 - Progress tracking via `localStorage` — nothing leaves your browser, no backend, no login.
 
 ## Tech
@@ -36,4 +41,5 @@ python3 -m http.server 8000
 
 ```bash
 node tests/quiz-engine.test.js
+node tests/sampling.test.js
 ```
