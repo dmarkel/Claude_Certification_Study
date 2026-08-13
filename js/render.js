@@ -159,5 +159,94 @@ const Render = (() => {
     });
   }
 
-  return { getParam, renderNav, renderCourseMap, courseProgressLabel, renderCoursePage, renderModulePage };
+  const DOMAIN_LABELS = {
+    delegation: 'Delegation',
+    description: 'Description',
+    discernment: 'Discernment',
+    diligence: 'Diligence',
+    'genai-fundamentals': 'Generative AI Fundamentals',
+  };
+
+  function renderPracticeTest(course, questions, progressState, container) {
+    const questionsHtml = questions.map((q, i) => `
+      <div class="question-card" data-question-id="${q.id}">
+        <p class="question-prompt">${i + 1}. ${q.prompt}</p>
+        <div class="option-list">
+          ${q.options.map((opt) => `<button class="option-button" data-option-id="${opt.id}">${opt.text}</button>`).join('')}
+        </div>
+        <div class="explanation" style="display:none;"></div>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <header class="page-header">
+        <p class="subtitle" style="margin-bottom:0.25rem;"><a href="course.html?course=${course.id}">← ${course.title}</a></p>
+        <h1>Practice Test</h1>
+        <p class="subtitle">Answer every question, then submit for your score and a domain breakdown.</p>
+      </header>
+      <div id="results"></div>
+      <form id="practice-test-form">
+        ${questionsHtml}
+        <button type="submit" class="button">Submit Test</button>
+      </form>
+    `;
+
+    const answers = {};
+    const form = container.querySelector('#practice-test-form');
+
+    questions.forEach((q) => {
+      const card = form.querySelector(`[data-question-id="${q.id}"]`);
+      card.querySelectorAll('.option-button').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          answers[q.id] = btn.getAttribute('data-option-id');
+          card.querySelectorAll('.option-button').forEach((b) => b.classList.remove('option-button--selected'));
+          btn.classList.add('option-button--selected');
+        });
+      });
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const result = QuizEngine.scoreTest(questions, answers);
+
+      // Reveal correct/incorrect per question with explanations.
+      questions.forEach((q) => {
+        const card = form.querySelector(`[data-question-id="${q.id}"]`);
+        const explanationEl = card.querySelector('.explanation');
+        card.querySelectorAll('.option-button').forEach((btn) => {
+          const optId = btn.getAttribute('data-option-id');
+          btn.disabled = true;
+          if (optId === q.correctOptionId) btn.classList.add('option-button--correct');
+          else if (optId === answers[q.id]) btn.classList.add('option-button--incorrect');
+        });
+        explanationEl.textContent = q.explanation;
+        explanationEl.style.display = 'block';
+      });
+
+      Progress.recordPracticeScore(progressState, course.id, result.percent);
+      Progress.save(progressState, window.localStorage);
+
+      const domainRows = result.domainBreakdown.map((d) => `
+        <div class="domain-bar-row">
+          <span>${DOMAIN_LABELS[d.domain] || d.domain}</span>
+          <span class="domain-bar-track"><span class="domain-bar-fill" style="width:${d.percent}%"></span></span>
+          <span>${d.percent}%</span>
+        </div>
+      `).join('');
+
+      container.querySelector('#results').innerHTML = `
+        <div class="score-summary">
+          <div class="score-number">${result.percent}%</div>
+          <p class="subtitle">${result.correct} of ${result.total} correct</p>
+          <div class="domain-breakdown">${domainRows}</div>
+        </div>
+      `;
+      container.querySelector('#results').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  return {
+    getParam, renderNav, renderCourseMap, courseProgressLabel,
+    renderCoursePage, renderModulePage, renderPracticeTest,
+  };
 })();

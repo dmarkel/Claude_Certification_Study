@@ -144,6 +144,7 @@ main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 .option-button:hover { border-color: var(--color-accent); }
 .option-button--correct { background: var(--color-success-soft); border-color: var(--color-success); }
 .option-button--incorrect { background: var(--color-error-soft); border-color: var(--color-error); }
+.option-button--selected { border-color: var(--color-accent); background: var(--color-accent-soft); }
 .option-button:disabled { cursor: default; }
 
 .explanation { margin-top: 0.75rem; padding: 0.75rem 1rem; background: var(--color-accent-soft); border-radius: 8px; font-size: 0.9rem; }
