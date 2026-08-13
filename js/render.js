@@ -50,7 +50,12 @@ const Render = (() => {
   }
 
   function renderCoursePage(course, modules, progressState, container) {
+    document.title = `${course.title} – Claude Certified Architect Study Guide`;
+
     if (course.status === 'placeholder') {
+      const examDomainHtml = course.examDomain
+        ? `<p class="subtitle" style="margin-top:0.5rem;"><strong>Exam blueprint:</strong> ${course.examDomain}</p>`
+        : '';
       container.innerHTML = `
         <header class="page-header">
           <h1>${course.title}</h1>
@@ -60,6 +65,7 @@ const Render = (() => {
         <section class="section">
           <span class="status-badge status-badge--placeholder">Coming Soon</span>
           <p class="subtitle" style="margin-top:0.75rem;">Not yet started. This course's study guide and practice test will be built out once it's actually completed.</p>
+          ${examDomainHtml}
         </section>
       `;
       return;
@@ -128,6 +134,7 @@ const Render = (() => {
   }
 
   function renderModulePage(course, module, progressState, container) {
+    document.title = `${module.title} – Claude Certified Architect Study Guide`;
     const alreadyStudied = Progress.isModuleStudied(progressState, course.id, module.id);
     container.innerHTML = `
       <header class="page-header">
@@ -168,6 +175,7 @@ const Render = (() => {
   };
 
   function renderPracticeTest(course, questions, progressState, container) {
+    document.title = `Practice Test: ${course.title} – Claude Certified Architect Study Guide`;
     const questionsHtml = questions.map((q, i) => `
       <div class="question-card" data-question-id="${q.id}">
         <p class="question-prompt">${i + 1}. ${q.prompt}</p>
