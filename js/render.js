@@ -172,7 +172,7 @@ const Render = (() => {
       <div class="question-card" data-question-id="${q.id}">
         <p class="question-prompt">${i + 1}. ${q.prompt}</p>
         <div class="option-list">
-          ${q.options.map((opt) => `<button class="option-button" data-option-id="${opt.id}">${opt.text}</button>`).join('')}
+          ${q.options.map((opt) => `<button type="button" class="option-button" data-option-id="${opt.id}">${opt.text}</button>`).join('')}
         </div>
         <div class="explanation" style="display:none;"></div>
       </div>
