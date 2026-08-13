@@ -136,6 +136,7 @@ const Render = (() => {
   function renderModulePage(course, module, progressState, container) {
     document.title = `${module.title} – Claude Certified Architect Study Guide`;
     const alreadyStudied = Progress.isModuleStudied(progressState, course.id, module.id);
+    const sampledChecks = Sampling.sampleN(module.knowledgeChecks, 3);
     container.innerHTML = `
       <header class="page-header">
         <p class="subtitle" style="margin-bottom:0.25rem;"><a href="course.html?course=${course.id}">← ${course.title}</a></p>
@@ -149,14 +150,14 @@ const Render = (() => {
       <section class="section">${module.body.map((p) => `<p>${p}</p>`).join('')}</section>
       <section class="section">
         <h2>Knowledge Check</h2>
-        ${module.knowledgeChecks.map(renderKnowledgeCheck).join('')}
+        ${sampledChecks.map(renderKnowledgeCheck).join('')}
       </section>
       <button id="mark-studied-btn" class="button" ${alreadyStudied ? 'disabled' : ''}>
         ${alreadyStudied ? '✓ Marked as studied' : 'Mark as studied'}
       </button>
     `;
 
-    wireKnowledgeChecks(container, module.knowledgeChecks);
+    wireKnowledgeChecks(container, sampledChecks);
 
     container.querySelector('#mark-studied-btn').addEventListener('click', (e) => {
       Progress.markModuleStudied(progressState, course.id, module.id);
