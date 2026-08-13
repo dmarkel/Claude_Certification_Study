@@ -16,7 +16,11 @@ const Progress = (() => {
       const raw = storage.getItem(KEY);
       if (!raw) return freshState();
       const parsed = JSON.parse(raw);
-      return { ...freshState(), ...parsed };
+      const fresh = freshState();
+      return {
+        modulesStudied: (parsed.modulesStudied && typeof parsed.modulesStudied === 'object') ? parsed.modulesStudied : fresh.modulesStudied,
+        practiceScores: (parsed.practiceScores && typeof parsed.practiceScores === 'object') ? parsed.practiceScores : fresh.practiceScores,
+      };
     } catch {
       return freshState();
     }
